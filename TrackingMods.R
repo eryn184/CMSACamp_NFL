@@ -200,6 +200,15 @@ formation_width <- tracking %>%
 plays <- plays %>%
   left_join(formation_width, by = c("gameId", "playId"))
 
+#formation width sd
+formation_width_sd <- tracking %>%
+  filter(PositionAbbr %in% offense_positions) %>%
+  filter(event == "ball_snap") %>%
+  group_by(gameId, playId) %>%
+  summarise(width_sd = sd(y))
+
+plays <- plays %>%
+  left_join(formation_width_sd, by = c("gameId", "playId"))
 
 
 # Width of Linemen and Height of Linemen ----------------------------------
@@ -212,7 +221,7 @@ linemen_positioning <- tracking %>%
   filter(event == "ball_snap") %>%
   group_by(gameId, playId) %>%
   summarise(linemen_width = max(y)- min(y), 
-            linemen_height = max(x) - min(x))
+            linemen_depth = max(x) - min(x))
 
 plays <- plays %>%
   left_join(linemen_positioning, by = c("gameId", "playId"))
@@ -273,6 +282,25 @@ TE_dist %>%
   theme_bw()
 
 
+# Hash Side ---------------------------------------------------------------
+
+#create df containing the y coords of Football at Snap
+ball_los <- tracking %>%
+  filter(displayName == "football", frame.id == 1)%>%
+  select(gameId, playId, y)
+names(ball_los)[3] <- c("los")
+
+ball_los <- ball_los %>%
+  mutate(hash = ifelse(los > 26.67, "left", "right")) %>%
+  dplyr::select(-los)
+
+plays <- plays %>%
+  left_join(ball_los, by = c("gameId", "playId"))
+
+
+
+
+
 # In Motion ---------------------------------------------------------------
 
 #Define- 
@@ -316,7 +344,7 @@ colSums(is.na(plays))
 
 
 
-# Situational Variables Model Using Caret ---------------------------------
+# Situational Variables Model Using GLM ---------------------------------
 
 set.seed(123)
 
@@ -343,7 +371,7 @@ predicted.classes <- ifelse(probabilities > 0.5, "Run", "Pass")
 mean(predicted.classes == test.data$pass_or_run)
 
 
-# Only Tracking Variables Model Using Caret -------------------------------
+# Only Tracking Variables Model Using GLM -------------------------------
 
 set.seed(234)
 

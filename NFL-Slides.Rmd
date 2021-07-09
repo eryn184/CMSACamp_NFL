@@ -4,7 +4,7 @@ subtitle: "Incorporating NFL Tracking Data"
 author: 
   - "Tej Seth"
   - "Nicole Tucker"
-date: 'July 7th, 2021'
+date: 'July 9th, 2021'
 output:
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -24,6 +24,12 @@ library(xaringanthemer)
 style_mono_accent(base_color = "#2d8dd6")
 ```
 
+# Previous Play Type Prediction Models
+
+- Use only situational factors from play by play data
+- Accuracy: 70.1 %
+
+---
 # The Data
 
 ```{r load-packages, warning = FALSE, message = FALSE, echo = FALSE}
@@ -86,8 +92,6 @@ NFL FastR 2017 Play by Play Data
 
 
 
-
-
 ```{r display-data, warning = FALSE, message = FALSE, echo = FALSE}
 library(gt)
 tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir,event,displayName, frame.id, playId, gameId) %>% gt()
@@ -118,18 +122,28 @@ tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir,event,displayName, fr
 
 # Defining Variables Created from Tracking Data
 
-- Width of Formation
-
-- Width of Offensive Line
-
-- Height of Offensive Line
-
+- Width of Formation + Standard Deviation
+- Width of Offensive Line + Standard Deviation 
+- Depth of Offensive Line
 - Deep Backfield RB- Indicator Variable
-
 - QB Position (Under Center, Shotgun, Pistol)
-
 - Personnel (Number of WRs, RBs, TEs)
+- Fullback- Indicator Variable
 
+
+```{r out.width='35%', echo = FALSE, fig.align='bottom'}
+knitr::include_graphics("linemendepth.jpeg")
+```
+
+---
+# Defining Variables Created from Tracking Data
+
+- Width of Formation + Standard Deviation
+- Width of Offensive Line + Standard Deviation 
+- Depth of Offensive Line
+- Deep Backfield RB- Indicator Variable
+- QB Position (Under Center, Shotgun, Pistol)
+- Personnel (Number of WRs, RBs, TEs)
 - Fullback- Indicator Variable
 
 --
@@ -137,6 +151,9 @@ tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir,event,displayName, fr
 __TBA Tracking Data Variables__
 
 - In Motion
+- Isolated Receivers
+- Number of Receivers on Opposite Side of Ball
+- Maximum Distance Receivers Start Behind Line
 
 ---
 
@@ -159,7 +176,24 @@ __TBA Tracking Data Variables__
 
 - Tracking Data Variables Only Accuracy: 71.6%
 
-- Mixture of Situational Factors and Tracking Data Variables Accuracy: 73.0%
+- Mixture of Situational Factors and Tracking Data Variables Accuracy: 73.65079%
+
+---
+
+# Completed Work
+
+- Created variables using tracking data
+- Created a basic model using only play by play data
+- Started creating models using tracking data variables
+
+--
+
+# Future Work
+
+- More variables from tracking data
+- Better accuracy
+- Look at predictability of NFL teams
+- Pinpoint the strengths of our model
 
 ---
 ### Definitions of the Variables Created From Tracking Data 
@@ -174,7 +208,7 @@ __TBA Tracking Data Variables__
   - Horizontal distance between the right most lineman and left most lineman
   - Maximum Y value of offensive linemen at the snap minus the minimum Y value of offensive linemen at the snap
 
-- Height of Offensive Line
+- Depth of Offensive Line
   - Helps to understand the effects of offensive line curvature
   - Maximum X value of offensive linemen at the snap minus the minimum X value of offensive linemen at the snap
 

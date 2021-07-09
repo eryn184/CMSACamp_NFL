@@ -16,7 +16,7 @@ class: center, middle, inverse, title-slide
 ## Incorporating NFL Tracking Data
 ### Tej Seth
 ### Nicole Tucker
-### July 7th, 2021
+### July 9th, 2021
 
 ---
 
@@ -24,6 +24,12 @@ class: center, middle, inverse, title-slide
 
 
 
+# Previous Play Type Prediction Models
+
+- Use only situational factors from play by play data
+- Accuracy: 70.1 %
+
+---
 # The Data
 
 
@@ -38,14 +44,12 @@ NFL FastR 2017 Play by Play Data
 
 
 
-
-
-<div id="qywbpiriqs" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<div id="jkxkglegpj" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>html {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
 }
 
-#qywbpiriqs .gt_table {
+#jkxkglegpj .gt_table {
   display: table;
   border-collapse: collapse;
   margin-left: auto;
@@ -70,7 +74,7 @@ NFL FastR 2017 Play by Play Data
   border-left-color: #D3D3D3;
 }
 
-#qywbpiriqs .gt_heading {
+#jkxkglegpj .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -82,7 +86,7 @@ NFL FastR 2017 Play by Play Data
   border-right-color: #D3D3D3;
 }
 
-#qywbpiriqs .gt_title {
+#jkxkglegpj .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -92,7 +96,7 @@ NFL FastR 2017 Play by Play Data
   border-bottom-width: 0;
 }
 
-#qywbpiriqs .gt_subtitle {
+#jkxkglegpj .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -102,13 +106,13 @@ NFL FastR 2017 Play by Play Data
   border-top-width: 0;
 }
 
-#qywbpiriqs .gt_bottom_border {
+#jkxkglegpj .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#qywbpiriqs .gt_col_headings {
+#jkxkglegpj .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -123,7 +127,7 @@ NFL FastR 2017 Play by Play Data
   border-right-color: #D3D3D3;
 }
 
-#qywbpiriqs .gt_col_heading {
+#jkxkglegpj .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -143,7 +147,7 @@ NFL FastR 2017 Play by Play Data
   overflow-x: hidden;
 }
 
-#qywbpiriqs .gt_column_spanner_outer {
+#jkxkglegpj .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -155,15 +159,15 @@ NFL FastR 2017 Play by Play Data
   padding-right: 4px;
 }
 
-#qywbpiriqs .gt_column_spanner_outer:first-child {
+#jkxkglegpj .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#qywbpiriqs .gt_column_spanner_outer:last-child {
+#jkxkglegpj .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#qywbpiriqs .gt_column_spanner {
+#jkxkglegpj .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -175,7 +179,7 @@ NFL FastR 2017 Play by Play Data
   width: 100%;
 }
 
-#qywbpiriqs .gt_group_heading {
+#jkxkglegpj .gt_group_heading {
   padding: 8px;
   color: #333333;
   background-color: #FFFFFF;
@@ -197,7 +201,7 @@ NFL FastR 2017 Play by Play Data
   vertical-align: middle;
 }
 
-#qywbpiriqs .gt_empty_group_heading {
+#jkxkglegpj .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -212,15 +216,15 @@ NFL FastR 2017 Play by Play Data
   vertical-align: middle;
 }
 
-#qywbpiriqs .gt_from_md > :first-child {
+#jkxkglegpj .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#qywbpiriqs .gt_from_md > :last-child {
+#jkxkglegpj .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#qywbpiriqs .gt_row {
+#jkxkglegpj .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -239,7 +243,7 @@ NFL FastR 2017 Play by Play Data
   overflow-x: hidden;
 }
 
-#qywbpiriqs .gt_stub {
+#jkxkglegpj .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -251,7 +255,7 @@ NFL FastR 2017 Play by Play Data
   padding-left: 12px;
 }
 
-#qywbpiriqs .gt_summary_row {
+#jkxkglegpj .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -261,7 +265,7 @@ NFL FastR 2017 Play by Play Data
   padding-right: 5px;
 }
 
-#qywbpiriqs .gt_first_summary_row {
+#jkxkglegpj .gt_first_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -271,7 +275,7 @@ NFL FastR 2017 Play by Play Data
   border-top-color: #D3D3D3;
 }
 
-#qywbpiriqs .gt_grand_summary_row {
+#jkxkglegpj .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -281,7 +285,7 @@ NFL FastR 2017 Play by Play Data
   padding-right: 5px;
 }
 
-#qywbpiriqs .gt_first_grand_summary_row {
+#jkxkglegpj .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -291,11 +295,11 @@ NFL FastR 2017 Play by Play Data
   border-top-color: #D3D3D3;
 }
 
-#qywbpiriqs .gt_striped {
+#jkxkglegpj .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#qywbpiriqs .gt_table_body {
+#jkxkglegpj .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -304,7 +308,7 @@ NFL FastR 2017 Play by Play Data
   border-bottom-color: #D3D3D3;
 }
 
-#qywbpiriqs .gt_footnotes {
+#jkxkglegpj .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -318,13 +322,13 @@ NFL FastR 2017 Play by Play Data
   border-right-color: #D3D3D3;
 }
 
-#qywbpiriqs .gt_footnote {
+#jkxkglegpj .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding: 4px;
 }
 
-#qywbpiriqs .gt_sourcenotes {
+#jkxkglegpj .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -338,41 +342,41 @@ NFL FastR 2017 Play by Play Data
   border-right-color: #D3D3D3;
 }
 
-#qywbpiriqs .gt_sourcenote {
+#jkxkglegpj .gt_sourcenote {
   font-size: 90%;
   padding: 4px;
 }
 
-#qywbpiriqs .gt_left {
+#jkxkglegpj .gt_left {
   text-align: left;
 }
 
-#qywbpiriqs .gt_center {
+#jkxkglegpj .gt_center {
   text-align: center;
 }
 
-#qywbpiriqs .gt_right {
+#jkxkglegpj .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#qywbpiriqs .gt_font_normal {
+#jkxkglegpj .gt_font_normal {
   font-weight: normal;
 }
 
-#qywbpiriqs .gt_font_bold {
+#jkxkglegpj .gt_font_bold {
   font-weight: bold;
 }
 
-#qywbpiriqs .gt_font_italic {
+#jkxkglegpj .gt_font_italic {
   font-style: italic;
 }
 
-#qywbpiriqs .gt_super {
+#jkxkglegpj .gt_super {
   font-size: 65%;
 }
 
-#qywbpiriqs .gt_footnote_marks {
+#jkxkglegpj .gt_footnote_marks {
   font-style: italic;
   font-weight: normal;
   font-size: 65%;
@@ -470,18 +474,26 @@ NFL FastR 2017 Play by Play Data
 
 # Defining Variables Created from Tracking Data
 
-- Width of Formation
-
-- Width of Offensive Line
-
-- Height of Offensive Line
-
+- Width of Formation + Standard Deviation
+- Width of Offensive Line + Standard Deviation 
+- Depth of Offensive Line
 - Deep Backfield RB- Indicator Variable
-
 - QB Position (Under Center, Shotgun, Pistol)
-
 - Personnel (Number of WRs, RBs, TEs)
+- Fullback- Indicator Variable
 
+
+&lt;img src="linemendepth.jpeg" width="35%" /&gt;
+
+---
+# Defining Variables Created from Tracking Data
+
+- Width of Formation + Standard Deviation
+- Width of Offensive Line + Standard Deviation 
+- Depth of Offensive Line
+- Deep Backfield RB- Indicator Variable
+- QB Position (Under Center, Shotgun, Pistol)
+- Personnel (Number of WRs, RBs, TEs)
 - Fullback- Indicator Variable
 
 --
@@ -489,6 +501,9 @@ NFL FastR 2017 Play by Play Data
 __TBA Tracking Data Variables__
 
 - In Motion
+- Isolated Receivers
+- Number of Receivers on Opposite Side of Ball
+- Maximum Distance Receivers Start Behind Line
 
 ---
 
@@ -514,6 +529,23 @@ __TBA Tracking Data Variables__
 - Mixture of Situational Factors and Tracking Data Variables Accuracy: 73.0%
 
 ---
+
+# Completed Work
+
+- Created variables using tracking data
+- Created a basic model using only play by play data
+- Started creating models using tracking data variables
+
+--
+
+# Future Work
+
+- More variables from tracking data
+- Better accuracy
+- Look at predictability of NFL teams
+- Pinpoint the strengths of our model
+
+---
 ### Definitions of the Variables Created From Tracking Data 
 
 - Width of Formation
@@ -526,7 +558,7 @@ __TBA Tracking Data Variables__
   - Horizontal distance between the right most lineman and left most lineman
   - Maximum Y value of offensive linemen at the snap minus the minimum Y value of offensive linemen at the snap
 
-- Height of Offensive Line
+- Depth of Offensive Line
   - Helps to understand the effects of offensive line curvature
   - Maximum X value of offensive linemen at the snap minus the minimum X value of offensive linemen at the snap
 
