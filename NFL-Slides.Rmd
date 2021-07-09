@@ -27,6 +27,7 @@ style_mono_accent(base_color = "#2d8dd6")
 # Previous Play Type Prediction Models
 
 - Use only situational factors from play by play data
+
 - Accuracy: 70.1 %
 
 ---
@@ -117,6 +118,7 @@ tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir,event,displayName, fr
 --
 
 - Accuracy: 72.6%
+- Brier Score: 0.1983135
 
 ---
 
@@ -177,6 +179,13 @@ __TBA Tracking Data Variables__
 - Tracking Data Variables Only Accuracy: 71.6%
 
 - Mixture of Situational Factors and Tracking Data Variables Accuracy: 73.65079%
+
+--
+
+- Situational Factors Only Brier Score: 0.1983135
+
+- Mixture of Situational Factors and Tracking Data Variables Brier Score: 0.1927617
+
 
 ---
 
