@@ -4,7 +4,7 @@ subtitle: "Incorporating NFL Tracking Data"
 author: 
   - "Tej Seth"
   - "Nicole Tucker"
-date: 'July 9th, 2021'
+date: 'July 12th, 2021'
 output:
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -26,7 +26,7 @@ style_mono_accent(base_color = "#2d8dd6")
 
 # Previous Play Type Prediction Models
 
-- Use only situational factors from play by play data
+- Only situational factors from play by play data
 
 - Accuracy: 70.1 %
 
@@ -87,13 +87,13 @@ tracking <- rbindlist(df_tracking)
 
 NFL 2017 Tracking Data Week 1 Through Week 6 
 
-Corresponding NFL Plays, Games and Players Data
+Corresponding NFL Play by Play, Games and Players Data
 
 NFL FastR 2017 Play by Play Data
 
 
 
-```{r display-data, warning = FALSE, message = FALSE, echo = FALSE}
+```{r display-data, warning = FALSE, message = FALSE, echo = FALSE, fig.pos='bottom'}
 library(gt)
 tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir,event,displayName, frame.id, playId, gameId) %>% gt()
 ```
@@ -186,6 +186,30 @@ __TBA Tracking Data Variables__
 
 - Mixture of Situational Factors and Tracking Data Variables Brier Score: 0.1927617
 
+---
+## Using a Mixture of Tracking Data Variables and Situational Variables Produces the Most Accurate Model
+
+
+- Mixture of Situational Factors and Tracking Data Variables Accuracy: 73.65079%
+
+```{r out.width='60%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("VarImpt.PNG")
+```
+
+---
+## Each Team's Pass Rate Over Expected for 2017 
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("PROE.PNG")
+```
+
+
+---
+##  The Predictability of Play Type Varies by Team
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("predictability.PNG")
+```
 
 ---
 
@@ -193,7 +217,8 @@ __TBA Tracking Data Variables__
 
 - Created variables using tracking data
 - Created a basic model using only play by play data
-- Started creating models using tracking data variables
+- Created models including tracking data variables
+- Began looking at the predictability of each team
 
 --
 
@@ -201,8 +226,7 @@ __TBA Tracking Data Variables__
 
 - More variables from tracking data
 - Better accuracy
-- Look at predictability of NFL teams
-- Pinpoint the strengths of our model
+- Pinpoint the strengths of our model (specific situations)
 
 ---
 ### Definitions of the Variables Created From Tracking Data 
