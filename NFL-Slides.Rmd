@@ -4,7 +4,7 @@ subtitle: "Incorporating NFL Tracking Data"
 author: 
   - "Tej Seth"
   - "Nicole Tucker"
-date: 'July 12th, 2021'
+date: 'July 15th, 2021'
 output:
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -111,14 +111,13 @@ tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir,event,displayName, fr
   - Down
   - Yards to Go
   - Yardline Number
-  - Shotgun Formation
   - Half Seconds Remaining  
   - Score Differential
   
 --
 
-- Accuracy: 72.6%
-- Brier Score: 0.1983135
+- Accuracy: 63.27%
+- Brier Score: 0.2085403
 
 ---
 
@@ -127,13 +126,9 @@ tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir,event,displayName, fr
 - Width of Formation + Standard Deviation
 - Width of Offensive Line + Standard Deviation 
 - Depth of Offensive Line
-- Deep Backfield RB- Indicator Variable
-- QB Position (Under Center, Shotgun, Pistol)
-- Personnel (Number of WRs, RBs, TEs)
-- Fullback- Indicator Variable
 
 
-```{r out.width='35%', echo = FALSE, fig.align='bottom'}
+```{r out.width='33%', echo = FALSE, fig.align='bottom'}
 knitr::include_graphics("linemendepth.jpeg")
 ```
 
@@ -147,26 +142,24 @@ knitr::include_graphics("linemendepth.jpeg")
 - QB Position (Under Center, Shotgun, Pistol)
 - Personnel (Number of WRs, RBs, TEs)
 - Fullback- Indicator Variable
+- Maximum Wide Receiver Distance Off Line of Scrimmage
+- Man in Motion- Indicator Variable
+- Tight End Starting Near Ball 
 
---
-
-__TBA Tracking Data Variables__
-
-- In Motion
-- Isolated Receivers
-- Number of Receivers on Opposite Side of Ball
-- Maximum Distance Receivers Start Behind Line
 
 ---
+## A Larger Formation Width May Indicate a Pass Play
 
-## Using Only Tracking Data Variables to Predict Play Type Results in a Similar Accuracy to the Only Situational Factors Model
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("width.png")
+```
 
---
+---
+## A Larger Linemen Width Standard Deviation May Indicate a Run Play
 
-- Situational Factors Only Accuracy: 72.6%
-
-- Tracking Data Variables Only Accuracy: 71.6%
-
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("linemense.PNG")
+```
 
 ---
 
@@ -174,7 +167,7 @@ __TBA Tracking Data Variables__
 
 --
 
-- Situational Factors Only Accuracy: 72.6%
+- Situational Factors Only Accuracy: 63.27 %
 
 - Tracking Data Variables Only Accuracy: 71.6%
 
@@ -182,7 +175,7 @@ __TBA Tracking Data Variables__
 
 --
 
-- Situational Factors Only Brier Score: 0.1983135
+- Situational Factors Only Brier Score: 0.2085403
 
 - Mixture of Situational Factors and Tracking Data Variables Brier Score: 0.1927617
 
@@ -218,15 +211,14 @@ knitr::include_graphics("predictability.PNG")
 - Created variables using tracking data
 - Created a basic model using only play by play data
 - Created models including tracking data variables
-- Began looking at the predictability of each team
+- Began investigating the predictability of each team
 
 --
 
 # Future Work
 
-- More variables from tracking data
-- Better accuracy
-- Pinpoint the strengths of our model (specific situations)
+- Look at how our model does in specific subsets
+- Expand our model to update predictions within the first three seconds of the play
 
 ---
 ### Definitions of the Variables Created From Tracking Data 
