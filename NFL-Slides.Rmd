@@ -95,7 +95,7 @@ NFL FastR 2017 Play by Play Data
 
 ```{r display-data, warning = FALSE, message = FALSE, echo = FALSE, fig.pos='bottom'}
 library(gt)
-tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir,event,displayName, frame.id, playId, gameId) %>% gt()
+tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir, dis, s, event,displayName, frame.id, playId, gameId) %>% gt()
 ```
 
 
@@ -161,33 +161,28 @@ knitr::include_graphics("width.png")
 knitr::include_graphics("linemense.PNG")
 ```
 
----
-
-## Using a Mixture of Tracking Data Variables and Situational Variables Produces the Most Accurate Model
-
---
-
-- Situational Factors Only Accuracy: 63.27 %
-
-- Tracking Data Variables Only Accuracy: 71.6%
-
-- Mixture of Situational Factors and Tracking Data Variables Accuracy: 73.65079%
-
---
-
-- Situational Factors Only Brier Score: 0.2085403
-
-- Mixture of Situational Factors and Tracking Data Variables Brier Score: 0.1927617
 
 ---
-## Using a Mixture of Tracking Data Variables and Situational Variables Produces the Most Accurate Model
+## Using a Larger Sample Size to Model Expected Pass for Situational Factors
 
-
-- Mixture of Situational Factors and Tracking Data Variables Accuracy: 73.65079%
+- Trained model on 2012-2017 FastR Play by Play Situational Data
+- Created a Situational Expected Pass Variable
 
 ```{r out.width='60%', echo = FALSE, fig.align='center'}
 knitr::include_graphics("VarImpt.PNG")
 ```
+
+---
+
+## Using a Mixture of Tracking Data Variables and Situational Variables Produces the Most Accurate Model
+
+
+- Situational Factors Only Accuracy: 63.27 %
+- Situational Factors Only Brier Score: 0.2085403
+
+
+- Mixture of Situational Factors and Tracking Data Variables Accuracy: 86.91667 %
+- Mixture of Situational Factors and Tracking Data Variables Brier Score: 0.0519
 
 ---
 ## Each Team's Pass Rate Over Expected for 2017 
