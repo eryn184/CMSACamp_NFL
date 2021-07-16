@@ -11,6 +11,9 @@ library(vip)
 library(data.table)
 library(ggthemes)
 library(caret)
+library(randomForest)
+library(nflfastR)
+library(ggimage)
 
 
 # Load Data ---------------------------------------------------------------
@@ -60,7 +63,7 @@ plays <- plays %>%
   filter(isSTPlay == "FALSE") %>%
   mutate(pass_or_run = ifelse(is.na(PassLength), "Run", "Pass")) %>%
   select(gameId, playId, quarter, GameClock, down, yardsToGo, possessionTeam, yardlineSide, 
-         yardlineNumber, offenseFormation, personnel.offense,pass_or_run, playDescription, defendersInTheBox)
+         yardlineNumber, offenseFormation, personnel.offense,pass_or_run, playDescription, defendersInTheBox, playDescription)
 
 
 # Adding Positions to Tracking Data ---------------------------------------
@@ -84,6 +87,14 @@ plays$gameId <- as.character(plays$gameId)
 
 plays <- plays %>%
   left_join(games_select, by = c("gameId"))
+
+#Adding Sacked? Column
+
+plays <- plays %>%
+  mutate(sacked = ifelse(grepl("sacked", plays$playDescription), TRUE, FALSE))
+
+plays <- plays %>%
+  mutate(pass_or_run = ifelse(sacked == TRUE, "Pass", pass_or_run))
 
 
 # Offense Personnel Vars --------------------------------------------------------------
@@ -142,21 +153,23 @@ plays <- plays %>%
 
 # Line of Scrimmage/Center Location at Snap -------------------------------------------------------
 
+plays$gameId <- as.character(plays$gameId)
+tracking$gameId <- as.character(tracking$gameId)
 
 #create df containing the x coords of Football at Snap
-ball_los <- tracking %>%
+los <- tracking %>%
   filter(displayName == "football", frame.id == 1)%>%
   select(gameId, playId, x)
-names(ball_los)[3] <- c("los")
+names(los)[3] <- c("los")
 
 
 #join LOS x coords to plays data
 plays <- plays %>%
-  left_join(ball_los, by = c("gameId", "playId")) 
+  left_join(los, by = c("gameId", "playId")) 
 
 #join Los x coord to tracking data
 tracking <- tracking %>%
-  left_join(ball_los, by = c("gameId", "playId"))
+  left_join(los, by = c("gameId", "playId"))
 
 
 
@@ -189,7 +202,7 @@ tracking <- tracking %>%
 offense_positions <- c("C", "FB", "G", "QB", "RB", "TE", "WR", "T")
 
 plays$gameId <- as.character(plays$gameId)
-formation_width$gameId <- as.character(formation_width$gameId) 
+tracking$gameId <- as.character(tracking$gameId) 
 
 formation_width <- tracking %>%
   filter(PositionAbbr %in% offense_positions) %>%
@@ -221,7 +234,8 @@ linemen_positioning <- tracking %>%
   filter(event == "ball_snap") %>%
   group_by(gameId, playId) %>%
   summarise(linemen_width = max(y)- min(y), 
-            linemen_depth = max(x) - min(x))
+            linemen_depth = max(x) - min(x),
+            linemen_width_sd = sd(y))
 
 plays <- plays %>%
   left_join(linemen_positioning, by = c("gameId", "playId"))
@@ -268,6 +282,8 @@ plays$is_fullback[is.na(plays$is_fullback)] <- 0
 
 
 # Exploring TE Distance ----------------------------------------------------------------
+#Distance from center or distance from QB?
+# Use Euclidean Dist???
 
 TE_dist <- tracking %>%
   filter(PositionAbbr %in% c("C", "TE")) %>%
@@ -282,23 +298,53 @@ TE_dist %>%
   theme_bw()
 
 
-# Hash Side ---------------------------------------------------------------
+# Hash Side- # Players on Open Field Side ---------------------------------------------------------------
 
-#create df containing the y coords of Football at Snap
 ball_los <- tracking %>%
-  filter(displayName == "football", frame.id == 1)%>%
-  select(gameId, playId, y)
+  filter(frame.id == 1) %>%
+  select(gameId, playId, y) 
 names(ball_los)[3] <- c("los")
 
 ball_los <- ball_los %>%
-  mutate(hash = ifelse(los > 26.67, "left", "right")) %>%
-  dplyr::select(-los)
+  mutate(hash = case_when(
+    los <= 24.5 ~ "L",
+    los >= 29 ~ "R",
+    TRUE ~ "C"
+  ))
+
+
+
+# Max Distance Receiver Starts Off Line-------------------------------------
+
+Receivers <- c("WR", "TE")
+
+los <- tracking %>%
+  filter(frame.id == 1, displayName == "football") %>% 
+  select(gameId, playId, x) 
+names(los)[3] <- c("los")
+
+tracking <- tracking %>% 
+  left_join(los, by = c("gameId", "playId"))
+
+#Distance from LOS column on TRACKING DATA
+tracking <- tracking %>%
+  mutate(distFromLos = abs(x - los))
+
+#Finding Receiver Furthest From line at Snap on each play
+deepest_players <- tracking %>%
+  filter(frame.id == 1)%>%
+  filter(PositionAbbr %in% Receivers) %>%
+  group_by(gameId, playId)%>%
+  filter(distFromLos == max(distFromLos))
+
+
+#Distance from LOS of player farthest from LOS
+max_depth_at_snap <- deepest_players %>%
+  select(gameId, playId, distFromLos)
+names(max_depth_at_snap)[3] <- c("receiver_offline")
 
 plays <- plays %>%
-  left_join(ball_los, by = c("gameId", "playId"))
-
-
-
+  left_join(max_depth_at_snap, by = c("gameId", "playId"))
 
 
 # In Motion ---------------------------------------------------------------
@@ -338,7 +384,13 @@ plays <- plays %>%
   filter(!is.na(offenseFormation)) %>%
   filter(!is.na(num_rb)) %>%
   filter(!is.na(yardlineNumber)) %>%
-  filter(!is.na(defendersInTheBox))
+  filter(!is.na(defendersInTheBox)) %>%
+  filter(!is.na(width)) %>%
+  filter(!is.na(width_sd)) %>%
+  filter(!is.na(linemen_width)) %>%
+  filter(!is.na(linemen_depth)) %>%
+  filter(!is.na(linemen_width_sd)) %>%
+  filter(!is.na(rb_deep))
 
 colSums(is.na(plays))
 
