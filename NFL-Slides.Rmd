@@ -4,7 +4,7 @@ subtitle: "Incorporating NFL Tracking Data"
 author: 
   - "Tej Seth"
   - "Nicole Tucker"
-date: 'July 16th, 2021'
+date: 'July 22nd, 2021'
 output:
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -24,9 +24,11 @@ library(xaringanthemer)
 style_mono_accent(base_color = "#2d8dd6")
 ```
 
-# Previous Play Type Prediction Models
+# Previous Play Type Prediction Models- NFLFastR
 
 - Only situational factors from play by play data
+
+- XGBoost Model
 
 - Accuracy: 70.1 %
 
@@ -99,7 +101,12 @@ tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir, dis, s, event,displa
 ```
 
 
+---
+# The Data
 
+```{r out.width='70%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("BDB_Schema.png")
+```
 
 ---
 
@@ -128,8 +135,8 @@ tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir, dis, s, event,displa
 - Depth of Offensive Line
 
 
-```{r out.width='33%', echo = FALSE, fig.align='bottom'}
-knitr::include_graphics("linemendepth.jpeg")
+```{r out.width='50%', echo = FALSE, fig.align='top'}
+knitr::include_graphics("olinediagram.jpeg")
 ```
 
 ---
@@ -147,6 +154,10 @@ knitr::include_graphics("linemendepth.jpeg")
 - Tight End Starting Near Ball- Indicator Variable
 
 
+```{r out.width='60%', echo = FALSE, fig.align='top'}
+knitr::include_graphics("setdiagram.jpeg")
+```
+
 ---
 ## A Larger Formation Width May Indicate a Pass Play
 
@@ -158,7 +169,7 @@ knitr::include_graphics("width.png")
 ## A Larger Linemen Width Standard Deviation May Indicate a Run Play
 
 ```{r out.width='65%', echo = FALSE, fig.align='center'}
-knitr::include_graphics("linemense.PNG")
+knitr::include_graphics("linemenwidthse.PNG")
 ```
 
 
@@ -168,7 +179,9 @@ knitr::include_graphics("linemense.PNG")
 - Trained model on 2012-2017 NFLFastR Play by Play Situational Data
 - Created a Situational Expected Pass Variable
 
-
+```{r out.width='55%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("DownYardlinePROE.PNG")
+```
 ---
 
 ## Using a Mixture of Tracking Data Variables and Situational Variables Produces the Most Accurate Model
@@ -178,25 +191,17 @@ knitr::include_graphics("linemense.PNG")
 - Situational Factors Only Brier Score: 0.2085403
 
 
-- Mixture of Situational Factors and Tracking Data Variables Accuracy: 78.1 %
-- Mixture of Situational Factors and Tracking Data Variables Brier Score: 0.06990601
+- Mixture of Situational Factors and Tracking Data Variables Accuracy: 75.2 %
+- Mixture of Situational Factors and Tracking Data Variables Brier Score: 0.167
 
 ---
 ## Using a Mixture of Tracking Data Variables and Situational Variables Produces the Most Accurate Model
 
-- Mixture of Situational Factors and Tracking Data Variables Accuracy: 78.1 %
-- Mixture of Situational Factors and Tracking Data Variables Brier Score: 0.06990601
+- Mixture of Situational Factors and Tracking Data Variables Accuracy: 75.2 %
+- Mixture of Situational Factors and Tracking Data Variables Brier Score: 0.167
 
 ```{r out.width='55%', echo = FALSE, fig.align='center'}
 knitr::include_graphics("VarImpt.PNG")
-```
-
-
----
-## Each Team's Pass Rate Over Expected for 2017 
-
-```{r out.width='65%', echo = FALSE, fig.align='center'}
-knitr::include_graphics("PROE.PNG")
 ```
 
 
@@ -207,6 +212,54 @@ knitr::include_graphics("PROE.PNG")
 knitr::include_graphics("Predictability.PNG")
 ```
 
+
+---
+## Each Team's Pass Rate Over Expected for 2017- Accuracy
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("PROE.PNG")
+```
+
+---
+
+## Each Team's Pass Rate Over Expected for 2017- Brier Score
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("xpBrier.PNG")
+```
+
+
+---
+## Effect of Team
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("mixedeffects.PNG")
+```
+---
+
+## Model Strengths- Down and Distance
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("BrierDownDist.PNG")
+```
+
+
+---
+
+## Model Calibration- Field Position 
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("yardlinecalibration.PNG")
+```
+
+---
+
+## Model Calibration- Down and Distance Situation
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("downdistcalibration.PNG")
+```
+
 ---
 
 # Completed Work
@@ -215,25 +268,15 @@ knitr::include_graphics("Predictability.PNG")
 - Created a basic model using only play by play data
 - Created models including tracking data variables
 - Began investigating the predictability of each team
+- Look at how our model does in specific subsets
 
 --
 
-# Future Work
+# Project Extension
 
-- Look at how our model does in specific subsets
 - Expand our model to update predictions within the first three seconds of the play
 
----
 
-```{r out.width='75%', echo = FALSE, fig.align='center'}
-knitr::include_graphics("xpBrier.PNG")
-```
-
----
-
-```{r out.width='75%', echo = FALSE, fig.align='center'}
-knitr::include_graphics("BrierDownDist.PNG")
-```
 
 ---
 ### Definitions of the Variables Created From Tracking Data 
