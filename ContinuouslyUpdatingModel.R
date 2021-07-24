@@ -176,7 +176,7 @@ frame_tracking <- frame_tracking %>%
 # Oline Speed -------------------------------------------------------------
 
 changes <- probs_and_preds %>%
-  select(gameId, playId, is_pass, xp)
+  select(gameId, playId, is_pass, xp, week)
 
 oline <- c("T", "C", "G")
 avgspeed <- frame_tracking %>%
@@ -187,7 +187,8 @@ avgspeed <- frame_tracking %>%
 changes$gameId <- as.character(changes$gameId)
 
 changes <- avgspeed %>%
-left_join(changes, by = c("gameId", "playId"))
+left_join(changes, by = c("gameId", "playId")) 
+names(changes)[4] <- c("avgspeedoline")
 
 
 # WR Speed ----------------------------------------------------------------
@@ -217,7 +218,8 @@ frame_tracking <- frame_tracking %>%
 olinedist <- frame_tracking %>%
   filter(PositionAbbr %in% oline) %>%
   group_by(gameId, playId, frame.id) %>%
-  summarise(olinedist = (mean(x)-los))
+  summarise(olinedist = (mean(x)-los)) %>%
+  unique()
 
 
 changes <- changes %>%
@@ -229,7 +231,138 @@ changes <- changes %>%
 wrdist <- frame_tracking %>%
   filter(PositionAbbr == "WR") %>%
   group_by(gameId, playId, frame.id) %>%
-  summarise(wrdist = (mean(x)-los))
+  summarise(wrdist = (mean(x)-los)) %>%
+  unique()
 
 changes <- changes %>%
   left_join(wrdist, by = c("gameId", "playId", "frame.id"))
+
+
+#remove NAs
+changes <- changes %>%
+  filter(!is.na(wrdist))
+
+changes <- changes %>%
+  filter(!is.na(is_pass))
+
+changes <- changes %>%
+  filter(!is.na(avgspeedoline))
+
+colSums(is.na(changes))
+
+
+
+# Build Model -------------------------------------------------------------
+
+
+changes <- changes %>%
+  arrange(gameId, playId, frame.id) %>%
+  group_by(gameId, playId) %>%
+  mutate(seconds_snap = row_number()/10)
+
+# 0-2.5 seconds
+
+changes <- changes %>%
+  filter(seconds_snap <= 2.5)
+
+changes <- changes %>%
+  ungroup() %>%
+  mutate(ID = row_number())
+
+#CHANGES CSV
+write_csv(changes, "changes.csv")
+
+#change to leave one week out
+set.seed(1985)
+week_fold_table <- tibble(week = unique(changes$week)) %>%
+  mutate(week_fold = sample(rep(1:6, length.out = n()), n()))
+plays <- changes %>% dplyr::left_join(game_fold_table, by = "gameId")
+
+
+
+logit_cv_preds <- 
+  map_dfr(unique(plays$game_fold), 
+          function(test_fold) {
+            # Separate test and training data:
+            test_data <- plays %>%
+              filter(game_fold == test_fold)
+            train_data <- plays %>%
+              filter(game_fold != test_fold)
+            # Train model:
+            logit_model <- glm(is_pass ~ xp + avgspeedoline + avgspeedwr + olinedist + wrdist, 
+                               data = train_data,family = "binomial")
+            # Return tibble of holdout results:
+            tibble(test_pred_probs = predict(logit_model, newdata = test_data,
+                                             type = "response"),
+                   test_actual = test_data$is_pass,
+                   game_fold = test_fold) 
+          })
+
+logit_cv_preds %>%
+  mutate(test_pred = ifelse(test_pred_probs < .5, 0, 1)) %>%
+  group_by(game_fold) %>%
+  summarize(mcr = mean(test_pred != test_actual))
+
+changes_preds <- cbind(changes, logit_cv_preds)
+
+
+changes_preds <- changes_preds %>%
+  mutate(pred_pass = ifelse(test_pred_probs > 0.5, 1, 0)) %>%
+  mutate(is_right = ifelse(pred_pass == is_pass, 1, 0))
+
+accuracy_sec <- changes_preds %>% 
+  group_by(seconds_snap) %>% 
+  summarize(count = n(), acc = mean(is_right))
+
+
+
+library(plotROC)
+logit_cv_preds %>%
+  ggplot() + 
+  geom_roc(aes(d = test_actual,
+               m = test_pred_probs),
+           labelround = 4) + 
+  style_roc() + 
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray") +
+  labs(color = "Test fold")
+with(logit_cv_preds, 
+     MLmetrics::AUC(test_pred_probs, test_actual))
+
+logit_cv_preds[1:10000,] %>%
+  group_by(game_fold) %>%
+  summarise(auc = MLmetrics::AUC(test_pred_probs, test_actual))
+
+
+# XGBoost -----------------------------------------------------------------
+
+library(xgboost)
+
+model_data <- changes %>%
+  mutate(is_pass = as.factor(is_pass))
+
+game_fold_table <- tibble(gameId = unique(model_data$gameId)) %>%
+  mutate(game_fold = sample(rep(1:5, length.out = n()), n()))
+model_data <- model_data %>% dplyr::left_join(game_fold_table, by = "gameId")
+         
+xgb_cv_preds <- 
+  map_dfr(unique(model_data$game_fold), 
+          function(test_fold) {
+            # Separate test and training data - scale variables:
+            test_data <- model_data %>% filter(game_fold == test_fold)
+            test_data_x <- as.matrix(dplyr::select(test_data, -is_pass, -game_fold, -frame.id, -gameId, -playId))
+            train_data <- model_data %>% filter(game_fold != test_fold)
+            train_data_x <- as.matrix(dplyr::select(train_data, -complete_pass, -game_fold))
+            train_data_y <- as.numeric(train_data$complete_pass) - 1
+            xgb_model <- xgboost(data = train_data_x, label = train_data_y,
+                                 nrounds = 100, max_depth = 3, eta = 0.3, 
+                                 gamma = 0, colsample_bytree = 1, min_child_weight = 1,
+                                 subsample = 1, nthread = 1,
+                                 objective = 'binary:logistic', eval_metric = 'auc', 
+                                 verbose = 0)
+            # Return tibble of holdout results:
+            tibble(test_pred_probs = 
+                     as.numeric(predict(xgb_model, newdata = test_data_x, type = "response")),
+                   test_actual = as.numeric(test_data$complete_pass) - 1,
+                   game_fold = test_fold) 
+          })
+
