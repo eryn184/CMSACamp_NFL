@@ -1,0 +1,317 @@
+---
+title: "Run vs. Pass Play Prediction:"
+subtitle: "Incorporating NFL Tracking Data"
+author: 
+  - "Tej Seth"
+  - "Nicole Tucker"
+date: 'July 28th, 2021'
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    nature:
+      slideNumberFormat: "%current%"
+      highlightStyle: github
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: true
+---
+```{r setup, echo = FALSE}
+knitr::opts_chunk$set(fig.retina = 3, warning = FALSE, message = FALSE)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_accent(base_color = "#2d8dd6")
+```
+
+# Previous Play Type Prediction Models- NFLFastR
+
+- Only Situational Factors
+  - Quarter
+  - Down
+  - Yards to Go
+  - Yardline Number
+  - Half Seconds Remaining  
+  - Score Differential
+  - Shotgun Formation
+
+- XGBoost Model
+
+- Accuracy: 70.1 %
+
+---
+# The Data
+
+```{r load-packages, warning = FALSE, message = FALSE, echo = FALSE}
+library(tidyverse)
+library(tidymodels)
+library(vip)
+library(data.table)
+library(ggthemes)
+
+```
+
+```{r load-data, warning = FALSE, message = FALSE, echo = FALSE}
+#Load Tabular Data
+plays <- read_csv("Data/plays.csv")
+players <- read_csv("Data/players.csv")
+games <- read_csv("Data/games.csv")
+
+#FastR Data
+pbp_17 <- nflfastR::load_pbp(2017)
+
+#Single Tracking File
+tracking_game_2017090700 <- read_csv("Data/tracking_gameId_2017090700.csv")
+  
+##Reading All tracking data
+
+#weeks of NFL season'
+ID <- c("090700", "091000", "091001", "091002", "091003", "091004", "091005", "091007", "091008", "091009", "091010",
+        "091011", "091012", "091100", "091101", "091400", "091700", "091701", "091702", "091703", "091704","091705",
+        "091706", "091707", "091708", "091709","091710", "091711", "091712", "091713", "091800", "092100", "092401",
+        "092402", "092403", "092404", "092405", "092406", "092407","092408", "092409", "092410", "092411", "092412",
+        "092413", "092500", "092800", "100100", "100101", "100102", "100103", "100104", "100105", "100106","100107",
+        "100108", "100109", "100110", "100111", "100112", "100113", "100200", "100500", "100800", "100801","100802", 
+        "100803", "100804", "100805", "100806", "100807", "100808", "100809", "100810", "100811", "100900", "101200",
+        "101500","101501", "101502", "101503", "101504", "101505", "101506", "101507", "101508", "101509", "101510",
+        "101511", "101600")
+
+#blank dataframe to store tracking data
+df_tracking <- list()
+
+#iterating through all weeks
+for(i in 1:length(ID)){
+  
+  #temperory dataframe used for reading week for given iteration
+  df_tracking_temp <- read_csv(paste0("Data/tracking_gameId_2017",ID[i],".csv"),
+                               col_types = cols())
+  
+  df_tracking[[i]] <- df_tracking_temp
+  
+}
+
+tracking <- rbindlist(df_tracking)
+
+```
+
+NFL 2017 Tracking Data Week 1 Through Week 6 
+
+Corresponding NFL Play by Play, Games and Players Data
+
+NFL FastR 2017 Play by Play Data
+
+
+
+```{r display-data, warning = FALSE, message = FALSE, echo = FALSE, fig.pos='bottom'}
+library(gt)
+tracking %>% slice_head(n = 5) %>% select(nflId, x, y, dir, dis, s, event,displayName, frame.id, playId, gameId) %>% gt()
+```
+
+
+---
+# The Data
+
+```{r out.width='70%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("BDB_Schema.png")
+```
+
+---
+
+# Created a Baseline Situational Factors Predictive Model for Comparison Purposes
+
+- Predictors:
+
+  - Quarter
+  - Down
+  - Yards to Go
+  - Yardline Number
+  - Half Seconds Remaining  
+  - Score Differential
+  
+--
+
+- Accuracy: 63.27%
+- Brier Score: 0.2085403
+
+---
+
+# Defining Variables Created from Tracking Data
+
+- Width of Formation + Standard Deviation
+- Width of Offensive Line + Standard Deviation 
+- Depth of Offensive Line
+
+
+```{r out.width='50%', echo = FALSE, fig.align='top'}
+knitr::include_graphics("olinediagram.jpeg")
+```
+
+---
+# Defining Variables Created from Tracking Data
+
+- Width of Formation + Standard Deviation
+- Width of Offensive Line + Standard Deviation 
+- Depth of Offensive Line
+- Deep Backfield RB- Indicator Variable
+- QB Position (Under Center, Shotgun, Pistol)
+- Personnel (Number of WRs, RBs, TEs)
+- Fullback- Indicator Variable
+- Maximum Wide Receiver Distance Off Line of Scrimmage
+- Man in Motion- Indicator Variable
+- Tight End Starting Near Ball- Indicator Variable
+
+
+```{r out.width='60%', echo = FALSE, fig.align='top'}
+knitr::include_graphics("setdiagram.jpeg")
+```
+
+---
+
+## Using a Larger Sample Size to Model Expected Pass for Situational Factors
+
+- Trained model on 2012-2017 NFLFastR Play by Play Situational Data
+- Created a Situational Expected Pass Variable
+
+```{r out.width='55%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("DownYardlinePROE.PNG")
+```
+
+---
+
+## Comparing Model Types
+
+```{r out.width='75%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("CompareChart.jpeg")
+```
+
+
+---
+##  The Predictability of Play Type Varies by Team
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("Predictability.PNG")
+```
+
+---
+## Mixed Effects Model- Effect of Team
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("mixedeffects.PNG")
+```
+
+---
+
+## Interpreting the Model
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("coefficients.JPG")
+```
+
+---
+## Expanding Our Model to Update Probability of Pass After Snap
+
+Updates every 0.10 of a second up to 2.5 seconds after the snap
+
+--
+
+Variables Created:
+- Average Offensive Linemen Distance from Line of Scrimmage
+- Average Offensive Linemen Speed
+- Average Receiver Distance from Line of Scrimmage
+- Average Receiver Speed
+- Probability of Pass Before Snap
+
+---
+## Average Prediction Accuracy Every 1/10 Second
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("avgaccovertime.jpeg")
+```
+
+---
+## Single Play Probabilities
+
+```{r out.width='75%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("final-brady.gif")
+```
+
+---
+
+# Completed Work
+
+- Created variables using tracking data
+- Created a basic model using only play by play data
+- Created models including tracking data variables
+- Investigated the predictability of each team
+- Looked at how our model does in specific subsets
+- Expanded our model to update predictions within the first 2.5 seconds of the play
+
+
+---
+# The Following Slides Include Additional Charts and Graphs 
+
+---
+## A Larger Formation Width May Indicate a Pass Play
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("width.png")
+```
+
+---
+## A Larger Linemen Width Standard Deviation May Indicate a Run Play
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("linemenwidthse.PNG")
+```
+
+
+---
+## Using a Mixture of Tracking Data Variables and Situational Variables Produces the Most Accurate Model
+
+- Situational Factors and Tracking Data Variables in a Random Forest Accuracy: 75.2 %
+- Situational Factors and Tracking Data Variables in a Random Forest Brier Score: 0.167
+
+```{r out.width='55%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("VarImpt.PNG")
+```
+
+---
+## Each Team's Pass Rate Over Expected for 2017- Accuracy
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("PROE.PNG")
+```
+
+---
+
+## Each Team's Pass Rate Over Expected for 2017- Brier Score
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("xpBrier.PNG")
+```
+
+---
+
+## Model Strengths- Down and Distance
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("BrierDownDist.PNG")
+```
+
+
+---
+
+## Model Calibration- Field Position 
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("yardlinecalibration.PNG")
+```
+
+---
+
+## Model Calibration- Down and Distance Situation
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("downdistcalibration.PNG")
+```
+

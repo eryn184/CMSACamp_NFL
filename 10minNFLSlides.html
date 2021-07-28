@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Run vs. Pass Play Prediction:</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Tej Seth" />
+    <meta name="author" content="Nicole Tucker" />
+    <script src="10minNFLSlides_files/header-attrs-2.8/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Run vs. Pass Play Prediction:
+## Incorporating NFL Tracking Data
+### Tej Seth
+### Nicole Tucker
+### July 28th, 2021
+
+---
+
+
+
+
+
+# Previous Play Type Prediction Models- NFLFastR
+
+- Only Situational Factors
+  - Quarter
+  - Down
+  - Yards to Go
+  - Yardline Number
+  - Half Seconds Remaining  
+  - Score Differential
+  - Shotgun Formation
+
+- XGBoost Model
+
+- Accuracy: 70.1 %
+
+---
+# The Data
+
+
+
+
+
+NFL 2017 Tracking Data Week 1 Through Week 6 
+
+Corresponding NFL Play by Play, Games and Players Data
+
+NFL FastR 2017 Play by Play Data
+
+
+
+<div id="eymbouronr" style="overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>html {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+}
+
+#eymbouronr .gt_table {
+  display: table;
+  border-collapse: collapse;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#eymbouronr .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#eymbouronr .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#eymbouronr .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 0;
+  padding-bottom: 4px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#eymbouronr .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eymbouronr .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#eymbouronr .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#eymbouronr .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#eymbouronr .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#eymbouronr .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#eymbouronr .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#eymbouronr .gt_group_heading {
+  padding: 8px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#eymbouronr .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#eymbouronr .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#eymbouronr .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#eymbouronr .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#eymbouronr .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 12px;
+}
+
+#eymbouronr .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eymbouronr .gt_first_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+}
+
+#eymbouronr .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#eymbouronr .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#eymbouronr .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#eymbouronr .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#eymbouronr .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#eymbouronr .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding: 4px;
+}
+
+#eymbouronr .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#eymbouronr .gt_sourcenote {
+  font-size: 90%;
+  padding: 4px;
+}
+
+#eymbouronr .gt_left {
+  text-align: left;
+}
+
+#eymbouronr .gt_center {
+  text-align: center;
+}
+
+#eymbouronr .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#eymbouronr .gt_font_normal {
+  font-weight: normal;
+}
+
+#eymbouronr .gt_font_bold {
+  font-weight: bold;
+}
+
+#eymbouronr .gt_font_italic {
+  font-style: italic;
+}
+
+#eymbouronr .gt_super {
+  font-size: 65%;
+}
+
+#eymbouronr .gt_footnote_marks {
+  font-style: italic;
+  font-weight: normal;
+  font-size: 65%;
+}
+</style>
+<table class="gt_table">
+  
+  <thead class="gt_col_headings">
+    <tr>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">nflId</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">x</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">y</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">dir</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">dis</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">s</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">event</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1">displayName</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">frame.id</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">playId</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1">gameId</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td class="gt_row gt_right">2495340</td>
+<td class="gt_row gt_right">41.56</td>
+<td class="gt_row gt_right">16.54</td>
+<td class="gt_row gt_right">78.90</td>
+<td class="gt_row gt_right">0.41</td>
+<td class="gt_row gt_right">3.91</td>
+<td class="gt_row gt_left">NA</td>
+<td class="gt_row gt_left">Anthony Sherman</td>
+<td class="gt_row gt_right">1</td>
+<td class="gt_row gt_right">44</td>
+<td class="gt_row gt_right">2017090700</td></tr>
+    <tr><td class="gt_row gt_right">2495340</td>
+<td class="gt_row gt_right">41.95</td>
+<td class="gt_row gt_right">16.62</td>
+<td class="gt_row gt_right">79.16</td>
+<td class="gt_row gt_right">0.40</td>
+<td class="gt_row gt_right">4.28</td>
+<td class="gt_row gt_left">NA</td>
+<td class="gt_row gt_left">Anthony Sherman</td>
+<td class="gt_row gt_right">2</td>
+<td class="gt_row gt_right">44</td>
+<td class="gt_row gt_right">2017090700</td></tr>
+    <tr><td class="gt_row gt_right">2495340</td>
+<td class="gt_row gt_right">42.40</td>
+<td class="gt_row gt_right">16.73</td>
+<td class="gt_row gt_right">79.46</td>
+<td class="gt_row gt_right">0.47</td>
+<td class="gt_row gt_right">4.66</td>
+<td class="gt_row gt_left">NA</td>
+<td class="gt_row gt_left">Anthony Sherman</td>
+<td class="gt_row gt_right">3</td>
+<td class="gt_row gt_right">44</td>
+<td class="gt_row gt_right">2017090700</td></tr>
+    <tr><td class="gt_row gt_right">2495340</td>
+<td class="gt_row gt_right">42.85</td>
+<td class="gt_row gt_right">16.82</td>
+<td class="gt_row gt_right">79.76</td>
+<td class="gt_row gt_right">0.46</td>
+<td class="gt_row gt_right">5.04</td>
+<td class="gt_row gt_left">NA</td>
+<td class="gt_row gt_left">Anthony Sherman</td>
+<td class="gt_row gt_right">4</td>
+<td class="gt_row gt_right">44</td>
+<td class="gt_row gt_right">2017090700</td></tr>
+    <tr><td class="gt_row gt_right">2495340</td>
+<td class="gt_row gt_right">43.36</td>
+<td class="gt_row gt_right">16.92</td>
+<td class="gt_row gt_right">80.12</td>
+<td class="gt_row gt_right">0.51</td>
+<td class="gt_row gt_right">5.39</td>
+<td class="gt_row gt_left">kickoff</td>
+<td class="gt_row gt_left">Anthony Sherman</td>
+<td class="gt_row gt_right">5</td>
+<td class="gt_row gt_right">44</td>
+<td class="gt_row gt_right">2017090700</td></tr>
+  </tbody>
+  
+  
+</table>
+</div>
+
+
+---
+# The Data
+
+&lt;img src="BDB_Schema.png" width="70%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Created a Baseline Situational Factors Predictive Model for Comparison Purposes
+
+- Predictors:
+
+  - Quarter
+  - Down
+  - Yards to Go
+  - Yardline Number
+  - Half Seconds Remaining  
+  - Score Differential
+  
+--
+
+- Accuracy: 63.27%
+- Brier Score: 0.2085403
+
+---
+
+# Defining Variables Created from Tracking Data
+
+- Width of Formation + Standard Deviation
+- Width of Offensive Line + Standard Deviation 
+- Depth of Offensive Line
+
+
+&lt;img src="olinediagram.jpeg" width="50%" /&gt;
+
+---
+# Defining Variables Created from Tracking Data
+
+- Width of Formation + Standard Deviation
+- Width of Offensive Line + Standard Deviation 
+- Depth of Offensive Line
+- Deep Backfield RB- Indicator Variable
+- QB Position (Under Center, Shotgun, Pistol)
+- Personnel (Number of WRs, RBs, TEs)
+- Fullback- Indicator Variable
+- Maximum Wide Receiver Distance Off Line of Scrimmage
+- Man in Motion- Indicator Variable
+- Tight End Starting Near Ball- Indicator Variable
+
+
+&lt;img src="setdiagram.jpeg" width="60%" /&gt;
+
+---
+
+## Using a Larger Sample Size to Model Expected Pass for Situational Factors
+
+- Trained model on 2012-2017 NFLFastR Play by Play Situational Data
+- Created a Situational Expected Pass Variable
+
+&lt;img src="DownYardlinePROE.PNG" width="55%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Comparing Model Types
+
+&lt;img src="CompareChart.jpeg" width="75%" style="display: block; margin: auto;" /&gt;
+
+
+---
+##  The Predictability of Play Type Varies by Team
+
+&lt;img src="Predictability.PNG" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+## Mixed Effects Model- Effect of Team
+
+&lt;img src="mixedeffects.PNG" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Interpreting the Model
+
+&lt;img src="coefficients.JPG" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+## Expanding Our Model to Update Probability of Pass After Snap
+
+Updates every 0.10 of a second up to 2.5 seconds after the snap
+
+--
+
+Variables Created:
+- Average Offensive Linemen Distance from Line of Scrimmage
+- Average Offensive Linemen Speed
+- Average Receiver Distance from Line of Scrimmage
+- Average Receiver Speed
+- Probability of Pass Before Snap
+
+---
+## Average Prediction Accuracy Every 1/10 Second
+
+&lt;img src="avgaccovertime.jpeg" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+## Single Play Probabilities
+
+&lt;img src="final-brady.gif" width="75%" style="display: block; margin: auto;" /&gt;
+
+---
+
+# Completed Work
+
+- Created variables using tracking data
+- Created a basic model using only play by play data
+- Created models including tracking data variables
+- Investigated the predictability of each team
+- Looked at how our model does in specific subsets
+- Expanded our model to update predictions within the first 2.5 seconds of the play
+
+
+---
+# The Following Slides Include Additional Charts and Graphs 
+
+---
+## A Larger Formation Width May Indicate a Pass Play
+
+&lt;img src="width.png" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+## A Larger Linemen Width Standard Deviation May Indicate a Run Play
+
+&lt;img src="linemenwidthse.PNG" width="65%" style="display: block; margin: auto;" /&gt;
+
+
+---
+## Using a Mixture of Tracking Data Variables and Situational Variables Produces the Most Accurate Model
+
+- Situational Factors and Tracking Data Variables in a Random Forest Accuracy: 75.2 %
+- Situational Factors and Tracking Data Variables in a Random Forest Brier Score: 0.167
+
+&lt;img src="VarImpt.PNG" width="55%" style="display: block; margin: auto;" /&gt;
+
+---
+## Each Team's Pass Rate Over Expected for 2017- Accuracy
+
+&lt;img src="PROE.PNG" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Each Team's Pass Rate Over Expected for 2017- Brier Score
+
+&lt;img src="xpBrier.PNG" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Model Strengths- Down and Distance
+
+&lt;img src="BrierDownDist.PNG" width="65%" style="display: block; margin: auto;" /&gt;
+
+
+---
+
+## Model Calibration- Field Position 
+
+&lt;img src="yardlinecalibration.PNG" width="65%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Model Calibration- Down and Distance Situation
+
+&lt;img src="downdistcalibration.PNG" width="65%" style="display: block; margin: auto;" /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "github",
+"highlightLines": true,
+"ratio": "16:9",
+"countIncrementalSlides": true
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
