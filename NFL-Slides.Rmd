@@ -1,10 +1,10 @@
 ---
-title: "Predicting Run vs. Pass"
+title: "Run vs. Pass Play Prediction:"
 subtitle: "Incorporating NFL Tracking Data"
 author: 
   - "Tej Seth"
   - "Nicole Tucker"
-date: 'July 28th, 2021'
+date: 'July 30th, 2021'
 output:
   xaringan::moon_reader:
     css: xaringan-themer.css
@@ -26,7 +26,14 @@ style_mono_accent(base_color = "#2d8dd6")
 
 # Previous Play Type Prediction Models- NFLFastR
 
-- Only situational factors from play by play data
+- Situational Factors from Play by Play Data
+  - Quarter
+  - Down
+  - Yards to Go
+  - Yardline Number
+  - Half Seconds Remaining  
+  - Score Differential
+  - Shotgun Formation
 
 - XGBoost Model
 
@@ -124,7 +131,7 @@ knitr::include_graphics("BDB_Schema.png")
 --
 
 - Accuracy: 63.27%
-- Brier Score: 0.2085403
+- Brier Score: 0.2085
 
 ---
 
@@ -182,6 +189,7 @@ knitr::include_graphics("linemenwidthse.PNG")
 ```{r out.width='55%', echo = FALSE, fig.align='center'}
 knitr::include_graphics("DownYardlinePROE.PNG")
 ```
+
 ---
 ## Comparing Model Types
 
@@ -255,9 +263,17 @@ knitr::include_graphics("downdistcalibration.PNG")
 ```
 
 ---
+
+## Interpreting the Model
+
+```{r out.width='65%', echo = FALSE, fig.align='center'}
+knitr::include_graphics("coefficients.JPG")
+```
+
+---
 ## Expanding Our Model to Update Probability of Pass After Snap
 
-Updates Every 0.10 of a second up to 2.5 seconds after the snap
+Updates every 0.10 of a second up to 2.5 seconds after the snap
 
 --
 
@@ -278,7 +294,7 @@ knitr::include_graphics("avgaccovertime.jpeg")
 ---
 ## Single Play Probabilities
 
-```{r out.width='65%', echo = FALSE, fig.align='center'}
+```{r out.width='70%', echo = FALSE, fig.align='center'}
 knitr::include_graphics("final-brady.gif")
 ```
 
@@ -292,4 +308,12 @@ knitr::include_graphics("final-brady.gif")
 - Investigated the predictability of each team
 - Looked at how our model does in specific subsets
 - Expanded our model to update predictions within the first 2.5 seconds of the play
+
+# Acknowledgements
+A big thank you to our project advisors!
+- Brian Macdonald
+- Sam Ventura
+
+And a big thank you to our program instructor, Ron Yurko, for all the help and support this summer!
+
 
